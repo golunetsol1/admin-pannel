@@ -488,6 +488,10 @@ html {
     }
 }
 
+.feedback li.active div svg.mouth {
+    filter: brightness(0) saturate(100%) invert(35%) sepia(42%) saturate(2117%) hue-rotate(338deg) brightness(106%) contrast(92%);
+}
+
 
 /**=====================
    3.36 Rating CSS Ends
