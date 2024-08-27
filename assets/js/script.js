@@ -15,28 +15,34 @@
         05. Translate js
 
  --------------------------------------------------------------------------------- */
- (function ($) {
-  "use strict";
 
-  // Close menu on click outside
+(function ($) {
+  "use strict";
   $(document).on("click", function (e) {
-    if (!$(".outside").is(e.target) && $(".outside").has(e.target).length === 0) {
-      $(".menu-to-be-close").removeClass("d-block").hide();
+    var outside_space = $(".outside");
+    if (
+      !outside_space.is(e.target) &&
+      outside_space.has(e.target).length === 0
+    ) {
+      $(".menu-to-be-close").removeClass("d-block");
+      $(".menu-to-be-close").css("display", "none");
     }
   });
 
-  // Close product details box
-  $(".prooduct-details-box .close").on("click", function () {
-    $(this).closest(".prooduct-details-box").addClass("d-none");
+  $(".prooduct-details-box .close").on("click", function (e) {
+    var tets = $(this).parent().parent().parent().parent().addClass("d-none");
+    console.log(tets);
   });
 
-  // Sidebar hover effects
   if ($(".page-wrapper").hasClass("horizontal-wrapper")) {
     $(".sidebar-list").hover(
-      function () { $(this).addClass("hoverd"); },
-      function () { $(this).removeClass("hoverd"); }
+      function () {
+        $(this).addClass("hoverd");
+      },
+      function () {
+        $(this).removeClass("hoverd");
+      }
     );
-
     $(window).on("scroll", function () {
       if ($(this).scrollTop() < 600) {
         $(".sidebar-list").removeClass("hoverd");
@@ -44,206 +50,338 @@
     });
   }
 
-  // Password show/hide functionality
+  /*----------------------------------------
+     password show hide
+     ----------------------------------------*/
   $(".show-hide").show();
   $(".show-hide span").addClass("show");
 
-  $(".show-hide span").on("click", function () {
-    const $passwordInput = $('input[name="login[password]"]');
+  $(".show-hide span").click(function () {
     if ($(this).hasClass("show")) {
-      $passwordInput.attr("type", "text");
+      $('input[name="login[password]"]').attr("type", "text");
       $(this).removeClass("show");
     } else {
-      $passwordInput.attr("type", "password");
+      $('input[name="login[password]"]').attr("type", "password");
       $(this).addClass("show");
     }
   });
-
   $('form button[type="submit"]').on("click", function () {
     $(".show-hide span").addClass("show");
-    $('input[name="login[password]"]').attr("type", "password");
+    $(".show-hide")
+      .parent()
+      .find('input[name="login[password]"]')
+      .attr("type", "password");
   });
 
-  // Background image handling
+  /*=====================
+      02. Background Image js
+      ==========================*/
   $(".bg-center").parent().addClass("b-center");
   $(".bg-img-cover").parent().addClass("bg-size");
   $(".bg-img-cover").each(function () {
-    const src = $(this).attr("src");
-    $(this).parent().css({
-      "background-image": `url(${src})`,
+    var el = $(this),
+      src = el.attr("src"),
+      parent = el.parent();
+    parent.css({
+      "background-image": "url(" + src + ")",
       "background-size": "cover",
       "background-position": "center",
-      display: "block"
-    }).end().hide();
+      display: "block",
+    });
+    el.hide();
   });
 
-  // Header and menu toggle actions
-  $(".mega-menu-container").hide();
-
-  $(".header-search").on("click", function () {
+  $(".mega-menu-container").css("display", "none");
+  $(".header-search").click(function () {
     $(".search-full").addClass("open");
   });
-
-  $(".close-search").on("click", function () {
+  $(".close-search").click(function () {
     $(".search-full").removeClass("open");
     $("body").removeClass("offcanvas");
   });
-
-  $(".mobile-toggle").on("click", function () {
+  $(".mobile-toggle").click(function () {
     $(".nav-menus").toggleClass("open");
   });
-
-  $(".mobile-toggle-left").on("click", function () {
+  $(".mobile-toggle-left").click(function () {
     $(".left-header").toggleClass("open");
   });
-
-  $(".bookmark-search").on("click", function () {
+  $(".bookmark-search").click(function () {
     $(".form-control-search").toggleClass("open");
   });
-
-  $(".filter-toggle").on("click", function () {
+  $(".filter-toggle").click(function () {
     $(".product-sidebar").toggleClass("open");
   });
-
-  $(".toggle-data").on("click", function () {
+  $(".toggle-data").click(function () {
     $(".product-wrapper").toggleClass("sidebaron");
   });
-
-  $(".form-control-search input").on("keyup", function () {
-    $(".page-wrapper").toggleClass("offcanvas-bookmark", $(this).val().length > 0);
-  });
-
-  $(".search-full input").on("keyup", function () {
-    $("body").toggleClass("offcanvas", $(this).val().length > 0);
-  });
-
-  // Escape key functionality
-  $(document).on("keydown", function (e) {
-    if (e.keyCode === 27) {
-      $(".search-full input, .form-control-search input").val("");
+  $(".form-control-search input").keyup(function (e) {
+    if (e.target.value) {
+      $(".page-wrapper").addClass("offcanvas-bookmark");
+    } else {
       $(".page-wrapper").removeClass("offcanvas-bookmark");
-      $(".search-full, .search-form .form-control-search").removeClass("open");
+    }
+  });
+  $(".search-full input").keyup(function (e) {
+    console.log(e.target.value);
+    if (e.target.value) {
+      $("body").addClass("offcanvas");
+    } else {
       $("body").removeClass("offcanvas");
     }
   });
 
-  // Dark/light mode toggle
+  $("body").keydown(function (e) {
+    if (e.keyCode == 27) {
+      $(".search-full input").val("");
+      $(".form-control-search input").val("");
+      $(".page-wrapper").removeClass("offcanvas-bookmark");
+      $(".search-full").removeClass("open");
+      $(".search-form .form-control-search").removeClass("open");
+      $("body").removeClass("offcanvas");
+    }
+  });
   $(".mode").on("click", function () {
-    const isDarkMode = $("body").hasClass("dark-only");
-    $("body").toggleClass("dark-only", !isDarkMode).toggleClass("light", isDarkMode);
-    $(this).toggleClass("active", !isDarkMode);
-    localStorage.setItem("mode", isDarkMode ? "light" : "dark-only");
+    const bodyModeDark = $("body").hasClass("dark-only");
+
+    if (!bodyModeDark) {
+      $(".mode").addClass("active");
+      localStorage.setItem("mode", "dark-only");
+      $("body").addClass("dark-only");
+      $("body").removeClass("light");
+    }
+    if (bodyModeDark) {
+      $(".mode").removeClass("active");
+      localStorage.setItem("mode", "light");
+      $("body").removeClass("dark-only");
+      $("body").addClass("light");
+    }
+  }); 
+  // $("body").addClass(
+  //   localStorage.getItem("mode")
+  //     ? localStorage.getItem("mode")
+  //     : "light"
+  // ); 
+  $(".mode").addClass(
+    localStorage.getItem("mode") === "dark-only" ? "active" : " "
+  );
+
+  // sidebar filter
+  $(".md-sidebar .md-sidebar-toggle ").on("click", function (e) {
+    $(".md-sidebar .md-sidebar-aside ").toggleClass("open");
   });
 
-  $(".mode").addClass(localStorage.getItem("mode") === "dark-only" ? "active" : "");
-
-  // Sidebar filter
-  $(".md-sidebar .md-sidebar-toggle").on("click", function () {
-    $(".md-sidebar .md-sidebar-aside").toggleClass("open");
-  });
-
-  // Loader fade out
   $(".loader-wrapper").fadeOut("slow", function () {
     $(this).remove();
   });
 
-  // Scroll to top button
   $(window).on("scroll", function () {
-    $(".tap-top").toggle($(this).scrollTop() > 600);
+    if ($(this).scrollTop() > 600) {
+      $(".tap-top").fadeIn();
+    } else {
+      $(".tap-top").fadeOut();
+    }
   });
 
-  $(".tap-top").on("click", function () {
-    $("html, body").animate({ scrollTop: 0 }, 600);
+  $(".tap-top").click(function () {
+    $("html, body").animate(
+      {
+        scrollTop: 0,
+      },
+      600
+    );
     return false;
   });
+  (function ($, window, document, undefined) {
+    "use strict";
+    var $ripple = $(".js-ripple");
+    $ripple.on("click.ui.ripple", function (e) {
+      var $this = $(this);
+      var $offset = $this.parent().offset();
+      var $circle = $this.find(".c-ripple__circle");
+      var x = e.pageX - $offset.left;
+      var y = e.pageY - $offset.top;
+      $circle.css({
+        top: y + "px",
+        left: x + "px",
+      });
+      $this.addClass("is-active");
+    });
+    $ripple.on(
+      "animationend webkitAnimationEnd oanimationend MSAnimationEnd",
+      function (e) {
+        $(this).removeClass("is-active");
+      }
+    );
+  })(jQuery, window, document);
 
-  // Ripple effect
-  $(".js-ripple").on("click.ui.ripple", function (e) {
-    const $this = $(this);
-    const $offset = $this.parent().offset();
-    const $circle = $this.find(".c-ripple__circle");
-    const x = e.pageX - $offset.left;
-    const y = e.pageY - $offset.top;
-    $circle.css({ top: `${y}px`, left: `${x}px` });
-    $this.addClass("is-active");
-  }).on("animationend webkitAnimationEnd oanimationend MSAnimationEnd", function () {
-    $(this).removeClass("is-active");
-  });
+  // active link
 
-  // Chat menu toggle
-  $(".chat-menu-icons .toogle-bar").on("click", function () {
+  $(".chat-menu-icons .toogle-bar").click(function () {
     $(".chat-menu").toggleClass("show");
   });
 
-  // Language translation
+  // Language
+  var tnum = "en";
+
   $(document).ready(function () {
-    const primaryColor = localStorage.getItem("primary");
-    const secondaryColor = localStorage.getItem("secondary");
-    
-    if (primaryColor) {
-      $("#ColorPicker1").val(primaryColor);
-    }
-    if (secondaryColor) {
-      $("#ColorPicker2").val(secondaryColor);
+    if (localStorage.getItem("primary") != null) {
+      var primary_val = localStorage.getItem("primary");
+      $("#ColorPicker1").val(primary_val);
+      var secondary_val = localStorage.getItem("secondary");
+      $("#ColorPicker2").val(secondary_val);
     }
 
-    $(document).on("click", function () {
+    $(document).click(function (e) {
       $(".translate_wrapper, .more_lang").removeClass("active");
     });
-
-    $(".translate_wrapper .current_lang").on("click", function (e) {
+    $(".translate_wrapper .current_lang").click(function (e) {
       e.stopPropagation();
       $(this).parent().toggleClass("active");
+
       setTimeout(function () {
         $(".more_lang").toggleClass("active");
       }, 5);
     });
 
-    $(".more_lang .lang").on("click", function () {
-      const lang = $(this).data("value");
-      const iconClass = $(this).find("i").attr("class");
-      
+    /*TRANSLATE*/
+    translate(tnum);
+
+    $(".more_lang .lang").click(function () {
       $(this).addClass("selected").siblings().removeClass("selected");
       $(".more_lang").removeClass("active");
-      translate(lang);
-      $(".current_lang .lang-txt").text(lang);
-      $(".current_lang i").attr("class", iconClass);
-    });
 
-    // Initial translation
-    translate("en");
+      var i = $(this).find("i").attr("class");
+      var lang = $(this).attr("data-value");
+      var tnum = lang;
+      translate(tnum);
+
+      $(".current_lang .lang-txt").text(lang);
+      $(".current_lang i").attr("class", i);
+    });
   });
 
   function translate(tnum) {
-    trans.forEach(function (item, index) {
-      $(`.lan-${index + 1}`).text(item[tnum]);
-    });
+    $(".lan-1").text(trans[0][tnum]);
+    $(".lan-2").text(trans[1][tnum]);
+    $(".lan-3").text(trans[2][tnum]);
+    $(".lan-4").text(trans[3][tnum]);
+    $(".lan-5").text(trans[4][tnum]);
+    $(".lan-6").text(trans[5][tnum]);
+    $(".lan-7").text(trans[6][tnum]);
+    $(".lan-8").text(trans[7][tnum]);
+    $(".lan-9").text(trans[8][tnum]);
   }
 
-  const trans = [
-    { en: "General", pt: "Geral", es: "Generalo", fr: "Générale", de: "Generel", cn: "一般", ae: "الحالة العامة" },
-    { en: "Dashboards, widgets & layout.", pt: "Painéis, widgets e layout.", es: "Paneloj, fenestraĵoj kaj aranĝo.", fr: "Tableaux de bord, widgets et mise en page.", de: "Dashboards, widgets en lay-out.", cn: "仪表板、小工具和布局。", ae: "لوحات المعلومات، الودجتس والتخطيط." },
-    { en: "Dashboards", pt: "Painéis", es: "Paneloj", fr: "Tableaux", de: "Dashboards", cn: "仪表板", ae: "لوحات المعلومات" },
-    { en: "Default", pt: "Padrão", es: "Vaikimisi", fr: "Défaut", de: "Standaard", cn: "默认", ae: "افتراضي" },
-    { en: "Ecommerce", pt: "Comércio eletrônico", es: "Comercio", fr: "Commerce électronique", de: "E-commerce", cn: "电子商务", ae: "التجارة الإلكترونية" },
-    { en: "Widgets", pt: "Ferramenta", es: "Vidin", fr: "Widgets", de: "Widgets", cn: "小部件", ae: "الأدوات" },
-    { en: "Page layout", pt: "Layout da página", es: "Paga aranĝo", fr: "Tableaux", de: "Mise en page", cn: "页面布局", ae: "تخطيط الصفحة" },
-    { en: "Applications", pt: "Formulários", es: "Aplikoj", fr: "Applications", de: "Toepassingen", cn: "应用领域", ae: "التطبيقات" },
-    { en: "Ready to use Apps", pt: "Pronto para usar aplicativos", es: "Preta uzi Apps", fr: "Applications prêtes à l'emploi", de: "Klaar om apps te gebruiken", cn: "仪表板", ae: "جاهزة لاستخدام التطبيقات" }
+  var trans = [
+    {
+      en: "General",
+      pt: "Geral",
+      es: "Generalo",
+      fr: "GÃ©nÃ©rale",
+      de: "Generel",
+      cn: "ä¸€èˆ¬",
+      ae: "Ø­Ø¬Ù†Ø±Ø§Ù„ Ù„ÙˆØ§Ø¡",
+    },
+    {
+      en: "Dashboards,widgets & layout.",
+      pt: "PainÃ©is, widgets e layout.",
+      es: "Paneloj, fenestraÄµoj kaj aranÄo.",
+      fr: "Tableaux de bord, widgets et mise en page.",
+      de: "Dashboards, widgets en lay-out.",
+      cn: "ä»ªè¡¨æ¿ï¼Œå°å·¥å…·å’Œå¸ƒå±€ã€‚",
+      ae: "Ù„ÙˆØ­Ø§Øª Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª ÙˆØ§Ù„Ø£Ø¯ÙˆØ§Øª ÙˆØ§Ù„ØªØ®Ø·ÙŠØ·.",
+    },
+    {
+      en: "Dashboards",
+      pt: "PainÃ©is",
+      es: "Paneloj",
+      fr: "Tableaux",
+      de: "Dashboards",
+      cn: " ä»ªè¡¨æ¿ ",
+      ae: "ÙˆØ­Ø§Øª Ø§Ù„Ù‚ÙŠØ§Ø¯Ø© ",
+    },
+    {
+      en: "Default",
+      pt: "PadrÃ£o",
+      es: "Vaikimisi",
+      fr: "DÃ©faut",
+      de: "Standaard",
+      cn: "é›»å­å•†å‹™",
+      ae: "ÙˆØ¥ÙØªØ±Ø§Ø¶ÙŠ",
+    },
+    {
+      en: "Ecommerce",
+      pt: "ComÃ©rcio eletrÃ´nico",
+      es: "Komerco",
+      fr: "Commerce Ã©lectronique",
+      de: "E-commerce",
+      cn: "é›»å­å•†å‹™",
+      ae: "ÙˆØ§Ù„ØªØ¬Ø§Ø±Ø© Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ©",
+    },
+    {
+      en: "Widgets",
+      pt: "Ferramenta",
+      es: "Vidin",
+      fr: "Widgets",
+      de: "Widgets",
+      cn: "å°éƒ¨ä»¶",
+      ae: "ÙˆØ§Ù„Ø­Ø§Ø¬ÙŠØ§Øª",
+    },
+    {
+      en: "Page layout",
+      pt: "Layout da pÃ¡gina",
+      es: "PaÄa aranÄo",
+      fr: "Tableaux",
+      de: "Mise en page",
+      cn: "é é¢ä½ˆå±€",
+      ae: "ÙˆØªØ®Ø·ÙŠØ· Ø§Ù„ØµÙØ­Ø©",
+    },
+    {
+      en: "Applications",
+      pt: "FormulÃ¡rios",
+      es: "Aplikoj",
+      fr: "Applications",
+      de: "Toepassingen",
+      cn: "æ‡‰ç”¨é ˜åŸŸ",
+      ae: "ÙˆØ§Ù„ØªØ·Ø¨ÙŠÙ‚Ø§Øª",
+    },
+    {
+      en: "Ready to use Apps",
+      pt: "Pronto para usar aplicativos",
+      es: "Preta uzi Apps",
+      fr: " Applications prÃªtes Ã  lemploi ",
+      de: "Klaar om apps te gebruiken",
+      cn: "ä»ªè¡¨æ¿",
+      ae: "Ø¬Ø§Ù‡Ø² Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„ØªØ·Ø¨ÙŠÙ‚Ø§Øª",
+    },
   ];
 
-  // Flip card effect
-  $("#flip-btn").on("click", function () {
+  $(".mobile-title svg").click(function () {
+    $(".header-mega").toggleClass("d-block");
+  });
+
+  $(".onhover-dropdown").on("click", function () {
+    $(this).children(".onhover-show-div").toggleClass("active");
+  });
+
+  $("#flip-btn").click(function () {
     $(".flip-card-inner").addClass("flipped");
   });
 
-  $("#flip-back").on("click", function () {
+  $("#flip-back").click(function () {
     $(".flip-card-inner").removeClass("flipped");
   });
-
-  // Show and hide input
-  $("#searchIcon").on("click", function () {
-    $("#searchInput").toggleClass("show");
-  });
+  // ================== show and hide input start
+  const toggle = document.getElementById("searchIcon")
+  let newinput = false
+  toggle.addEventListener("click", function(){
+    newinput = !newinput
+    if(newinput){
+      document.getElementById("searchInput").classList.add("show")
+    }else{
+      document.getElementById("searchInput").classList.remove("show")
+    }
+  })
+  // ================ show and hide input css end 
 
 })(jQuery);
